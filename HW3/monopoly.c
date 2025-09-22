@@ -28,9 +28,17 @@ typedef struct Property
 //return 1 if the transaction is successful
 //Otherwise, return 0
 int transaction(TPlayer *p1, TPlayer *p2, int amount)
-{
-
-
+{   
+    if(p1 -> balance >= amount){
+        p1 -> balance -= amount;
+        p2 -> balance += amount;
+        return 1;
+    }
+    else{
+        p2 -> balance += p1 -> balance;
+        p1 -> balance = 0;
+        return 0;
+    }
 }
 
 //TODO
@@ -40,16 +48,33 @@ int transaction(TPlayer *p1, TPlayer *p2, int amount)
 
 int one_round(int m, int n, TPlayer p[], TProperty prop[])
 {
+    //loops through number of players.
 	for(int i = 0; i < m; i++)
 	{
 		int steps = rand() % 6 + 1 + rand() % 6 + 1;
 		//fill in the code below
 
+        p[i].loc = (p[i].loc + steps) % n;
+        //check if current property is owned
 
-
-
-
-
+        if(prop[p[i].loc].owner_id == -1){
+            //check to see if able to buy property
+            if(p[i].balance >= prop[p[i].loc].rent){
+                p[i].balance -= prop[p[i].loc].rent;
+                prop[p[i].loc].owner_id = p[i].id;
+            }
+        }
+        else if(prop[p[i].loc].owner_id != -1){
+            if(prop[p[i].loc].owner_id != p[i].id){
+                //must pay rent to other player
+                TPlayer *owner = &p[prop[p[i].loc].owner_id];
+                transaction(&p[i], owner, prop[p[i].loc].rent);
+                if(p[i].balance <= 0){
+                    return 0;
+                }
+            }
+            
+        }
 	}
 	return 1;
 }
