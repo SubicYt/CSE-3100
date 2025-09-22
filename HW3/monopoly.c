@@ -64,16 +64,23 @@ int one_round(int m, int n, TPlayer p[], TProperty prop[])
                 prop[p[i].loc].owner_id = p[i].id;
             }
         }
-        else if(prop[p[i].loc].owner_id != -1){
-            if(prop[p[i].loc].owner_id != p[i].id){
-                //must pay rent to other player
-                TPlayer *owner = &p[prop[p[i].loc].owner_id];
-                transaction(&p[i], owner, prop[p[i].loc].rent);
-                if(p[i].balance <= 0){
-                    return 0;
-                }
-            }
-            
+
+        else if(prop[p[i].loc].owner_id != -1 && 
+		prop[p[i].loc].owner_id!= p[i].id){
+
+			int propertyOwner = prop[p[i].loc].owner_id;
+			TPlayer* owner = NULL;
+			for(int k = 0; k < m; k++){
+				if(p[k].id == propertyOwner){
+					owner = &p[k];
+					break;
+				}
+			}
+			
+			if(!transaction(&p[i], owner, prop[p[i].loc].rent)){
+				//player was bankrupt
+				return 0;
+			}
         }
 	}
 	return 1;
@@ -142,6 +149,9 @@ int main(int argc, char *argv[])
 		p[j].loc = 0;
 		p[j].balance = n;
 	}
+	monopoly(m, n, p, prop, rounds);
+	return 0;	
+}
 	monopoly(m, n, p, prop, rounds);
 	return 0;	
 }
