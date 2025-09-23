@@ -152,6 +152,3 @@ int main(int argc, char *argv[])
 	monopoly(m, n, p, prop, rounds);
 	return 0;	
 }
-	monopoly(m, n, p, prop, rounds);
-	return 0;	
-}
