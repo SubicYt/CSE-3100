@@ -9,7 +9,7 @@ enum TYPE {S, I, R};
 //this integer should be unique for every x, y pair in your grid
 int idx(int x, int y, int k)
 {
-//implement later;
+    //implement later;
     int size = 2 * k + 1;
     return (x + k) * size + (y + k); //returns unique index for each pair;
 }
@@ -131,8 +131,8 @@ int summary(THost hosts[], int m)
 	if(I_n == 0)
 	{
 		printf("    S        I        R\n");
-    	printf("%lf %lf %lf\n", (double)S_n/(S_n + I_n + R_n), 
-		(double)I_n/(S_n + I_n + R_n), (double)R_n/(S_n + I_n + R_n));
+        printf("%lf %lf %lf\n", (double)S_n/(S_n + I_n + R_n), 
+	    (double)I_n/(S_n + I_n + R_n), (double)R_n/(S_n + I_n + R_n));
 	}
 	return I_n > 0;
 }
@@ -150,18 +150,23 @@ int one_round(THost *hosts, int m, node *p_arr[], int n_arr, int k, int T)
                 if(location_match(p_arr[index], hosts[i]))
             {
             	//TODO: fill in what should happen here (not long) 
-
+                //if host matches susceptible host then susceptible host becomes infected 
+                hosts[i].type = I;
+                hosts[i].t = 0;
 			}
         }
 		else if(hosts[i].type == I)
         {
            	//TODO: fill in what should happen here (not long)
+            hosts[i].t += 1;
+            if(hosts[i].t >= T){
+                hosts[i].type = R;
+            }
         }   
     }
 
 	//TODO: fill in code below
     //reset all linked lists
-
 	for(int i = 0; i < m; i++)
 	{
 		int r = rand() % 4;
