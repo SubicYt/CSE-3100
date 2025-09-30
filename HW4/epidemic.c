@@ -9,7 +9,9 @@ enum TYPE {S, I, R};
 //this integer should be unique for every x, y pair in your grid
 int idx(int x, int y, int k)
 {
-    
+//implement later;
+    int size = 2 * k + 1;
+    return (x + k) * size + (y + k); //returns unique index for each pair;
 }
 
 typedef struct Host
@@ -36,7 +38,7 @@ node * create_node(THost host)
         printf("Memory allocation failed\n");
         exit(-1);
     }
-    newNode -> hose = host;
+    newNode -> host = host;
     newNode -> next = NULL;
     return newNode;
 }
@@ -75,11 +77,12 @@ node * remove_first(node **head)
 void remove_all(node **head)
 {
     if(head == NULL || *head == NULL){
+        printf("Error: empty List");
         return;
     }
     node* curr = *head;
-    while(curr != NULL){
-        node*temp = curr->next;
+    while(curr!=NULL){
+        node* temp = curr->next;
         free(curr);
         curr = temp;
     }
@@ -91,6 +94,14 @@ void remove_all(node **head)
 //return 1 if there is a match, 0 if not
 int location_match(node *head, THost host)
 { 
+    node* curr = head;
+    while(curr != NULL){
+        if(curr -> host.x == host.x && curr -> host.y == host.y){
+            return 1;
+        }
+        curr = curr -> next;
+    }
+    return 0;
 }
 
 
