@@ -77,7 +77,6 @@ node * remove_first(node **head)
 void remove_all(node **head)
 {
     if(head == NULL || *head == NULL){
-        printf("Error: empty List");
         return;
     }
     node* curr = *head;
@@ -167,6 +166,12 @@ int one_round(THost *hosts, int m, node *p_arr[], int n_arr, int k, int T)
 
 	//TODO: fill in code below
     //reset all linked lists
+
+    for(int i = 0; i < n_arr; i++)
+    {
+        remove_all(&p_arr[i]);
+    }
+    
 	for(int i = 0; i < m; i++)
 	{
 		int r = rand() % 4;
@@ -175,10 +180,10 @@ int one_round(THost *hosts, int m, node *p_arr[], int n_arr, int k, int T)
 		//TODO: update locations for all hosts
 		switch(r)
 		{
-			case 0: hosts[i].y = hosts[i].y + 1;
-			case 1: hosts[i].x = hosts[i].x + 1;
-			case 2: hosts[i].y = hosts[i].y - 1;
-			case 3: hosts[i].x = hosts[i].x - 1;
+			case 0: hosts[i].y = hosts[i].y + 1; break;
+			case 1: hosts[i].x = hosts[i].x + 1; break;
+			case 2: hosts[i].y = hosts[i].y - 1; break;
+			case 3: hosts[i].x = hosts[i].x - 1; break;
 		}
 
 		//buid linked list for I hosts
