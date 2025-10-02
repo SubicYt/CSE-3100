@@ -8,9 +8,25 @@ node* addition(node* num1, node* num2) {
     node* result = NULL;
     int carry = 0; 
     //TODO: Write code to add two numbers represented by num1 and num2
-    num1 = reverse_list(num1);
-    num2 = reverse_list(num2);
-    
+    while(num1!= NULL || num2!= NULL){
+        int summed_digit = 0;
+        
+        if(num1 != NULL){
+            summed_digit += num1->v;
+            num1 = num1 -> next;
+        }
+
+        if(num2 != NULL){
+            summed_digit += num2 -> v;
+            num2 = num2 -> next;
+        }
+        //need to prepend the digits i think idk tho,
+        summed_digit += carry;
+        int digit_to_append = summed_digit % 10;
+        carry = summed_digit / 10;
+        result = prepend(result, new_node(digit_to_append)); 
+        //where result in the prepend function is the head node.
+    }
     return result;
 }
 
@@ -57,17 +73,17 @@ int main(int argc,char *argv[]){
         num2 = prepend(num2,new_node(argv[2][i]-'0'));
     }
     sum = addition(num1,num2);
-    difference = subtraction(num1,num2);
+    //difference = subtraction(num1,num2);
 
     sum = remove_leading_zeros(sum);
-    difference = remove_leading_zeros(difference);
+    //difference = remove_leading_zeros(difference);
     
     print_list(sum);
-    print_list(difference);
+    //print_list(difference);
 
     delete_list(num1);
     delete_list(num2);
     delete_list(sum);
-    delete_list(difference);
+    //delete_list(difference);
     return 0;
 }
