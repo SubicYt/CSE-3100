@@ -34,7 +34,20 @@ node* subtraction(node *num1,node *num2){
     node *result = NULL;
     int borrow = 0;
     //TODO: Write code to subtract num2 from num1
-    
+    while(num1 != NULL || num2 != NULL){
+        int difference = 0;
+        if(num1 != NULL && num2 != NULL){
+            if(num1 -> v < num2 -> v){
+                borrow = num1 -> next -> v;
+                borrow -= 1;
+                num1->v += 10;
+            }
+            difference = num1 - num2;
+            num1 = num1->next;
+            num2 = num2 ->next;
+        }
+    result = prepend(result, new_node(difference));
+    }
     return result;
 }
 
@@ -76,14 +89,14 @@ int main(int argc,char *argv[]){
     //difference = subtraction(num1,num2);
 
     sum = remove_leading_zeros(sum);
-    //difference = remove_leading_zeros(difference);
+    difference = remove_leading_zeros(difference);
     
     print_list(sum);
-    //print_list(difference);
+    print_list(difference);
 
     delete_list(num1);
     delete_list(num2);
     delete_list(sum);
-    //delete_list(difference);
+    delete_list(difference);
     return 0;
 }
