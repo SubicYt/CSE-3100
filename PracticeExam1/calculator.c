@@ -40,9 +40,10 @@ node* subtraction(node *num1,node *num2){
             if(num1 -> v < num2 -> v){
                 borrow = num1 -> next -> v;
                 borrow -= 1;
+                num1 -> next -> v = borrow;
                 num1->v += 10;
             }
-            difference = num1 - num2;
+            difference = num1 ->v - num2 ->v;
             num1 = num1->next;
             num2 = num2 ->next;
         }
