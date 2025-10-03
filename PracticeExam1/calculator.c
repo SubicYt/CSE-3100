@@ -52,7 +52,6 @@ node* subtraction(node *num1,node *num2){
     return result;
 }
 
-
 node *remove_leading_zeros(node *num){
     node *temp = num;
     while(temp!=NULL && temp->v == 0){
