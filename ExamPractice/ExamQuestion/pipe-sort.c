@@ -134,19 +134,65 @@ void pipe_sort(int seed, int n, int print_sorted, int num_printed){
     //
     // All processes should close file descriptors that are not needed.
     int childpid1 = fork();
+    if(childpid1 < 0){
+        die("fork eror");
+        exit(EXIT_FAILURE);
+    }
+    
     if(childpid1 == 0){
-        close(pd1(PFD_READ));
-        qsort(u, half, sizeof(u[0]), compare_int()); 
-        for(int i = 0; i < half - 1, i++){
-            write_int(pd1(PFD_WRITE), u[i]);
+        close(pd1[PFD_READ]);
+        close(pd2[PFD_READ]);
+        close(pd2[PFD_WRITE]);
+        //childpid1 only writes to the sorted array
+        qsort(a, half, sizeof(int), compare_int);
+        for(int i = 0; i < half; i++){
+            write_int(pd1[PFD_WRITE], a[i]);
         }
-        close(pd1(PFD_WRITE));
-        exit(1);
+        close(pd1[PFD_WRITE]);
+    }
+    else{
+        //parent process of 1.
+        //careful of closing those pipes too early. closing stuff in the parent
+        //will close everything for all. 
+        //keep that in mind.
+        close(pd1[PFD_WRITE]);
+        for(int i = 0; i < half; i++){
+            read_int(pd1[PFD_READ], &a[i]);
+        }
+        close(pd1[PFD_READ]);
     }
 
     int childpid2 = fork();
+    
+    if(childpid2 < 0){
+        die("fork error");
+        exit(EXIT_FAILURE);
+    }
+
     if(childpid2 == 0){
+        //child process
+        //sort the second half
+        close(pd1[PFD_READ]);
+        close(pd1[PFD_WRITE]);
+        close(pd2[PFD_READ]);
         
+        qsort(b, n - half, sizeof(int), compare_int);
+        for(int i = 0; i < half; i++){
+            write_int(pd2[PFD_WRITE], b[i]);
+        }
+        close(pd2[PFD_WRITE]);
+    }
+    else{
+        waitpid(childpid2, NULL, 0);
+
+        close(pd2[PFD_WRITE]);
+        close(pd1[PFD_READ]);
+        close(pd1[PFD_WRITE]);
+
+        for(int i = 0; i<half; i++){
+            read_int(pd2[PFD_READ], &b[i]);
+        }
+        close(pd2[PFD_READ]);
     }
 
     int sorted[n];
