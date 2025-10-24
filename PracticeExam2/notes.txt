@@ -1,0 +1,40 @@
+fopen takes in FILE* 
+open takes in file descriptors which is int fd.
+
+Parent process creates a new clone child process
+- does this by calling fork()
+- childpid = fork() (gives a process id);
+
+execl
+execlp 
+    -used when you know number of args during compile time
+
+    int execlp(const char *file, const char *arg0, ..., (char *)NULL);
+        file: The name of the executable file to be run. 
+        If it doesn't contain a slash, execlp searches the PATH.
+        arg0, ...: A list of arguments to be passed to the new program, 
+        terminated by (char *)NULL.
+    
+
+    int execl(const char *path, const char *arg0, ..., NULL);
+        Parameters:
+        path: A null-terminated string representing the absolute 
+        path to the executable file of the new program. 
+        Unlike execlp, execl does not search the PATH environment variable.
+
+        arg0, arg1, ...: A list of null-terminated strings representing the 
+        arguments to be passed to the new program. By convention, 
+        arg0 should be the name of the executable itself (or its last component). 
+        This list must be terminated by a NULL pointer.
+
+
+execv
+execvp
+    -used when you dont know number of args
+
+      int execvp(const char *file, char *const argv[]);
+        Here, file is the name of the executable, 
+        and execvp will search for it in the PATH.
+    
+
+
