@@ -57,17 +57,21 @@ void remove_from_buffer(int *a, int *b, int *c, two_d_buffer *p)
     *b = p->buf[0][1];
     *c = p->buf[0][2];
     //make the rest of the items slide down to their respective positions
-    for(int i = 0; i < p->counts[0]; i++){
+    for(int i = 1; i < p->counts[0]; i++){
         p->buf[i-1][0] = p->buf[i][0];
     }
 
-    for(int k = 0; k < p->counts[1]; k++){
+    for(int k = 1; k < p->counts[1]; k++){
         p->buf[k-1][1] = p->buf[k][1];
     }
 
-    for(int j = 0; j < p->counts[2]; j++){
+    for(int j = 1; j < p->counts[2]; j++){
         p->buf[j-1][2] = p->buf[j][2];
     }
+
+    p->counts[0]--;
+    p->counts[1]--;
+    p->counts[2]--;
 
     pthread_cond_broadcast(&p->produce_cond);
     pthread_mutex_unlock(&p->mutex);
@@ -129,8 +133,23 @@ void* thread_produce(void* threadarg)
 	{
 		//TODO
 		//fill in code below
-        pthread_mutex_lock(&p->mutex);
+		pthread_mutex_lock(&q->mutex);
+		if(q->remain <= 0){
+			done = 1;
+			pthread_mutex_unlock(&q->mutex);
+			break;
+		}
+        pthread_mutex_unlock(&q->mutex);
 
+		pthread_mutex_lock(&p->mutex);
+        node *n = remove_first(&p->head, &p->tail);
+        pthread_mutex_unlock(&p->mutex);
+
+		prepare(n->v);
+		add_to_buffer(n->v, n->v, q);
+
+		my_data->total++;
+		free(n);
 	}
 	 
         pthread_exit(NULL);
@@ -189,7 +208,7 @@ int main(int argc, char *argv[])
 		//TODO
 		//complete the following line of code
 
-		rc = pthread_create(&threads[t], NULL, &thread_produce , &thread_data_array[t]);
+		rc = pthread_create(&threads[t], NULL, &thread_consume , &thread_data_array[t]);
         	if (rc) {
             		printf("ERROR; return code from pthread_create() is %d\n", rc);
             		exit(-1);
@@ -204,7 +223,7 @@ int main(int argc, char *argv[])
 		thread_data_array[n_consumer + t].p_barrier = &barrier;
 		//TODO
 		//complete the follow line of code
-                rc = pthread_create(&threads[n_consumer + t], NULL, &thread_consume , &thread_data_array[n_consumer + t]);
+                rc = pthread_create(&threads[n_consumer + t], NULL, &thread_produce , &thread_data_array[n_consumer + t]);
                 if (rc) {
                         printf("ERROR; return code from pthread_create() is %d\n", rc);
                         exit(-1);
@@ -223,7 +242,9 @@ int main(int argc, char *argv[])
 	int total = 0;
 	//TODO
 	//fill in code below
-	
+	for(int i =0; i<n_producer + n_consumer; i++){
+        total += thread_data_array[i].total;
+    }
 
 	printf("total = %d\n", total);
  
