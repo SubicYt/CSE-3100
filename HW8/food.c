@@ -144,7 +144,11 @@ void* thread_produce(void* threadarg)
 		pthread_mutex_lock(&p->mutex);
         node *n = remove_first(&p->head, &p->tail);
         pthread_mutex_unlock(&p->mutex);
-
+        
+        if (n == NULL) {
+        sleep(1); 
+        continue;
+    }
 		prepare(n->v);
 		add_to_buffer(n->v, n->v, q);
 
