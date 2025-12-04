@@ -60,6 +60,7 @@ void my_msleep(int r)
 // you can add more states if you like
 // S_INIT: not ready
 // S_READY: value is ready
+
 enum {S_INIT, S_READY};
 
 typedef struct {
@@ -75,12 +76,12 @@ typedef struct {
 //cond used to signal availability of new data
 //mutex used to protect access to the data
 
-
 // we use barrier here
 typedef struct {
     int     value;
     pthread_barrier_t barrier;
 } result_t;
+
 //barrier used to synchronize between players and referee
 // referee announces result after both players reach the barrier
 // players get the result after referee reaches the barrier
@@ -98,7 +99,7 @@ typedef struct {
     int id;                 // id is 1 or 2
     int seed;
     int n_rounds;           // number of rounds
-    int opt_quiet;
+    int opt_quiet; 
 
     shared_int_t    *choice;
     result_t *result;
@@ -137,7 +138,6 @@ a player will make thiir choice- something like choice->value = r;
 a player will set its status to choice - > status = S_INIT
 
 after we set the choice and status we need to signal that the players choice is ready??
-
 
 */
 
@@ -231,20 +231,8 @@ void * thread_referee(void *arg_ink)
         //      outcome = compare_choices(choice1, choice2);
         //
         // The big challenge is synchronization.
-        
 
         int choice1, choice2, outcome;
-
-        //we must wait
-        /*
-        psuedo code for this part of the problem
-        we need to process each choice seperatly because the ref deals with both
-
-        pthread_mutex_lock both.
-        we wait for the broadcast from the other 
-
-        
-        */
 
         pthread_mutex_lock(&p1->mutex);
         while(p1->status == S_INIT){
