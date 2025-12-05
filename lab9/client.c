@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
     freeaddrinfo(servinfo); // all done with this structure
 
     int min = 1, max, guess;
-    int result = 0;
+    int result = 1;
 
     /* TODO
      *
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
     int status, guess_num;
 
-    status = recv_all(sockfd, buf, LINE_SIZE); //reads to the buf variable.
+    status = recv_lines(sockfd, buf, LINE_SIZE); //reads to the buf variable.
     if(status < 0){
         perror("rec failed");
         //okay
@@ -149,11 +149,12 @@ int main(int argc, char *argv[])
         exit(2);
     }
 
+    printf("%d\n", max);
 
     while(result!=0){
 
         guess_num = (min + max) / 2;
-
+        printf("My guess: %d\n", guess_num);
         status = send_int(sockfd, guess_num);
         if(status < 0){
         perror("rec failed");
@@ -188,9 +189,9 @@ int main(int argc, char *argv[])
         }
 
         if (result > 0) {
-            min = guess + 1;
+            min = guess_num + 1;
         } else if (result < 0) {
-            max = guess - 1;
+            max = guess_num - 1;
         }
 
     }

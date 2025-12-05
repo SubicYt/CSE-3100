@@ -172,6 +172,13 @@ int send_int(int sid, int v)
     return send_all(sid, buf, n);
 }
 
+int get_number(char *s, int *pv)
+{
+    if (sscanf(s, "%d\n", pv) != 1)
+        return -1;
+    return 0;
+}
+
 
 typedef struct thread_arg_tag {
     int sockfd;
@@ -199,45 +206,53 @@ void * thread_main(void * arg_in)
     //  clean up: close FD and free memory. 
     //  Do clean up on error. See the demo code.
     int status;
-    status = send_int(sockfd, gmn_get_max(&gmn));
+    char buf[MSG_BUF_SIZE];
+    status = send_int(sockfd, gmn_get_max());
     if(status < 0){
         perror("send failed");
         close(sockfd);
         exit(1);
     }
 
-    int guessLoop = 0;
-    int guessNum;
-    while(guessLoop == 0){
-        status = recv(sockfd, &guessNum, sizeof(int), 0);
-        if(status < 0){
-            perror("send failed");
+    while (1) {
+        // receive the guess
+        status = recv_lines(sockfd, buf, MSG_BUF_SIZE);
+        if (status < 0) {
+            perror("receive failed");
             close(sockfd);
-            exit(1);
+            free(arg);
+            return NULL;
         }
 
-        int result;
+        int guessNum;
+        if (get_number(buf, &guessNum) < 0) {
+            perror("invalid number");
+            close(sockfd);
+            free(arg);
+            return NULL;
+        }
+        
+        // check the guess
+        int result = gmn_check(&gmn, guessNum);
 
-        result = gmn_check(&gmn, status);
+        // send result
         status = send_int(sockfd, result);
-
-        if(status < 0){
-            perror("send failed");
+        if (status < 0) {
+            perror("send result failed");
             close(sockfd);
-            exit(1);
+            free(arg);
+            return NULL;
         }
 
-        if(result == 0){
-            status = send_str(sockfd, gmn_get_message(&gmn));
-            if(status < 0){
-            perror("send failed");
-            close(sockfd);
-            exit(1);
-
-            guessLoop = 1; //breaks from loop
+        // if correct guess, send final message
+        if (result == 0) {
+            char *msg = gmn_get_message(&gmn);
+            status = send_all(sockfd, msg, strlen(msg));
+            if (status < 0) {
+                perror("send final message failed");
+            }
+            break;
         }
-
-        } 
     }
 
     close(sockfd);
