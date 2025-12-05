@@ -13,7 +13,7 @@ This can be important since we can read data from multiple threads at the same t
 If we protect a piece of data with a mutex, it will not allow multiple reads in parallel.
 */
 int count = 0;
-#define MAX 200
+#define MAX 2000000
 
 void* counter(){
     for(int i = 0; i < MAX; i++){
