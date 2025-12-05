@@ -129,13 +129,10 @@ void * thread_player(void *arg_in)
         // TODO
         //  send choice r to referee
         //  get the result from referee and save it into outcome
-        THINKING();
         
         pthread_mutex_lock(&choice->mutex);
-        while(choice->status == S_INIT){
-            pthread_cond_wait(&choice->cond, &choice->mutex);
-        }
         //now we are ready to make a choice
+
         choice->value = r;
         choice->status = S_READY;
         
@@ -145,7 +142,7 @@ void * thread_player(void *arg_in)
         //get result and save it to outcome
 
         pthread_barrier_wait(&result->barrier);
-        
+
         outcome = result->value;
 
         if (outcome == 0) 
@@ -204,6 +201,7 @@ void * thread_referee(void *arg_in)
         while(p1->status == S_INIT){
             pthread_cond_wait(&p1->cond, &p1->mutex);
         }
+
         //ready to assign choice1
         choice1 = p1->value;
         p1->status = S_READY;
@@ -218,9 +216,9 @@ void * thread_referee(void *arg_in)
         p2->status = S_READY;
         pthread_mutex_unlock(&p2->mutex);
 
-
+        result->value = compare_choices(choice1, choice2);
+        
         pthread_barrier_wait(&result->barrier);
-        outcome = compare_choices(choice1, choice2);
     }
     return NULL;
 }
